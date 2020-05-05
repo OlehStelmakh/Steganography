@@ -9,12 +9,20 @@ namespace Steganography
 
         private string[] arrayOfLines { get; set; }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="allInfo"></param>
         public Parser(string allInfo)
         {
             string[] separator = { "\n" };
             arrayOfLines = allInfo.Split(separator, StringSplitOptions.None);
         }
 
+        /// <summary>
+        /// Return a color from string that parsed from key file
+        /// </summary>
+        /// <returns>Color</returns>
         public Color GetColorFromString()
         {
             string colorName = arrayOfLines[0].Substring(0, 8);
@@ -25,12 +33,20 @@ namespace Steganography
             return Color.FromArgb(A, R, G, B);
         }
 
+        /// <summary>
+        /// Return a number-order of color relative to other with the same color
+        /// </summary>
+        /// <returns></returns>
         public int GetOffsetOfcolor()
         {
             string offset = arrayOfLines[0].Substring(8);
             return Convert.ToInt32(offset);
         }
 
+        /// <summary>
+        /// Return dictionary with symbols and hashes which was read from key file
+        /// </summary>
+        /// <returns></returns>
         public Dictionary<char, List<string>> GetInfoAboutAllSymbols()
         {
 
@@ -62,6 +78,10 @@ namespace Steganography
             return symbolsAndHashes;
         }
 
+        /// <summary>
+        /// Length of encrypted text
+        /// </summary>
+        /// <returns></returns>
         public int GetLengthOfText()
         {
             string length = arrayOfLines[arrayOfLines.Length - 1];

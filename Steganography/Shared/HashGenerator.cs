@@ -5,6 +5,11 @@ namespace Steganography.Shared
 {
     class HashGenerator
     {
+        /// <summary>
+        /// Generate SHA256 hash for given string
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public static string GenerateUniqueValue256(string input)
         {
             SHA256 shaHash = SHA256.Create();

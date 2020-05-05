@@ -13,11 +13,20 @@ namespace Steganography.Encrypt
     class ImageEncoder
     {
         private readonly ImageInfo _imageInformation;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="imageInfo"></param>
         public ImageEncoder(ImageInfo imageInfo)
         {
             _imageInformation = imageInfo;
         }
 
+        /// <summary>
+        /// Generate random coordinates and create a Pixel using them
+        /// </summary>
+        /// <returns></returns>
         public Pixel GetFirstRandomCoordinates()
         {
             Random random = new Random();
@@ -28,6 +37,11 @@ namespace Steganography.Encrypt
             return coordinates;
         }
 
+        /// <summary>
+        /// Calculate color offset of first coordinates
+        /// </summary>
+        /// <param name="firstCoordinates"></param>
+        /// <returns></returns>
         public int CalcuteOffset(Pixel firstCoordinates)
         {
             int offsetCount = 0;
@@ -53,6 +67,12 @@ namespace Steganography.Encrypt
             return offsetCount;
         }
 
+        /// <summary>
+        /// Create a dictionary with symbols and related colors
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="firstCoordinates"></param>
+        /// <returns></returns>
         public Dictionary<char, List<Pixel>> GetAllColors(string text, Pixel firstCoordinates)
         {
             Dictionary<char, List<Pixel>> keyValues = new Dictionary<char, List<Pixel>>();
@@ -75,22 +95,11 @@ namespace Steganography.Encrypt
             return keyValues;
         }
 
-        public Dictionary<char, List<Pixel>> AddUniqueNumberToPixel(Dictionary<char, List<Pixel>> symbolsAndPixelsInfo)
-        {
-            List<Pixel> pixels = new List<Pixel>();
-            foreach (var symbolAndPixels in symbolsAndPixelsInfo)
-            {
-                pixels.AddRange(symbolAndPixels.Value);
-            }
-
-            for (int i = 0; i < pixels.Count; i++)
-            {
-                pixels[i].UniqueNumber = i + 1;
-            }
-
-            return symbolsAndPixelsInfo;
-        }
-
+        /// <summary>
+        /// Create a dictionary that include symbols and their hashes
+        /// </summary>
+        /// <param name="symbolsAndColors"></param>
+        /// <returns></returns>
         public Dictionary<char, List<string>> CreateOutputHashesInfo(Dictionary<char, List<Pixel>> symbolsAndColors)
         {
 
@@ -110,6 +119,11 @@ namespace Steganography.Encrypt
             return symbolsAndHashes;
         }
 
+        /// <summary>
+        /// Generate noise hashes for each symbol that not included in text
+        /// </summary>
+        /// <param name="symbolsAndColors"></param>
+        /// <returns></returns>
         public Dictionary<char, List<string>> GenerateSymbolNoise(Dictionary<char, List<Pixel>> symbolsAndColors)
         {
             Dictionary<char, List<string>> noiseSymbolsAndHashes = new Dictionary<char, List<string>>();
@@ -139,5 +153,5 @@ namespace Steganography.Encrypt
         }
     }
 
-    
+
 }

@@ -36,6 +36,9 @@ namespace Steganography
 
         private string _message;
 
+        /// <summary>
+        /// Message for encryption
+        /// </summary>
         public string Message
         {
             get => _message;
@@ -48,6 +51,9 @@ namespace Steganography
 
         private string _statusText;
 
+        /// <summary>
+        /// Text for status textblock
+        /// </summary>
         public string StatusText
         {
             get => _statusText;
@@ -60,6 +66,9 @@ namespace Steganography
 
         public Bitmap bm { set; get; }
 
+        /// <summary>
+        /// Constructor that instantiate the commands
+        /// </summary>
         public MainCalculations()
         {
             OpenFileDialogCommand = new Command(ExecuteOpenFileDialog);
@@ -93,7 +102,7 @@ namespace Steganography
             {
                 using (var stream = new FileStream(openFileDialog.FileName, FileMode.Open))
                 {
-                    
+
                     ImageBinding = BitmapFrame.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
                     RaisePropertyChanged("ImageBinding");
                     if (ImageBinding.Width < 4 || ImageBinding.Height < 4)
@@ -105,7 +114,7 @@ namespace Steganography
                     Bitmap bitmap = new Bitmap(stream);
                     _downloadedImage = new ImageInfo(image, bitmap, openFileDialog.FileName);
                     _downloadedImage.Pixels = ImageProcessing.BitmapToArray2D(_downloadedImage.Bitmap);
-                    
+
                 }
             }
         }
@@ -201,8 +210,9 @@ namespace Steganography
             }
         }
 
-        
-
+        /// <summary>
+        /// Notify when property changed
+        /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
         void RaisePropertyChanged(string propertyName)
         {

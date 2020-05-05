@@ -14,12 +14,21 @@ namespace Steganography.Decrypt
         private readonly ParsedData _parsedData;
         private readonly ImageInfo _imageInfo;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="parsedData"></param>
+        /// <param name="imageInfo"></param>
         public ImageDecoder(ParsedData parsedData, ImageInfo imageInfo)
         {
             _parsedData = parsedData;
             _imageInfo = imageInfo;
         }
 
+        /// <summary>
+        /// Return coordinates of first color using decrypted color, image and offset
+        /// </summary>
+        /// <returns></returns>
         public Pixel GetCoordinatesOfFirst()
         {
             int count = 1;
@@ -46,6 +55,11 @@ namespace Steganography.Decrypt
             return pixel;
         }
 
+        /// <summary>
+        /// Return decrypted string using firsc coordinates and symbol-hash dictionary
+        /// </summary>
+        /// <param name="firstCoordinates"></param>
+        /// <returns></returns>
         public string DecryptText(Pixel firstCoordinates)
         {
             StringBuilder stringBuilder = new StringBuilder(_parsedData.LengthOfText);
@@ -60,6 +74,12 @@ namespace Steganography.Decrypt
             return stringBuilder.ToString();
         }
 
+        /// <summary>
+        /// Searches for which symbol the given hash corresponds to
+        /// </summary>
+        /// <param name="parsedData"></param>
+        /// <param name="pixel"></param>
+        /// <returns></returns>
         private char FindSymbolInHashes(ParsedData parsedData, Pixel pixel)
         {
             string input = pixel.X + pixel.Color.Name + pixel.Y + pixel.UniqueNumber;

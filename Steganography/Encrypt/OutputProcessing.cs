@@ -10,10 +10,20 @@ namespace Steganography.Encrypt
     class OutputProcessing
     {
         private readonly OutputInfo _outputInfo;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="outputInfo"></param>
         public OutputProcessing(OutputInfo outputInfo)
         {
             _outputInfo = outputInfo;
         }
+
+        /// <summary>
+        /// Generate output string that will be encoded by Rijndael algorithm
+        /// </summary>
+        /// <returns></returns>
         public string CreateOutputString()
         {
             StringBuilder stringBuilder = new StringBuilder(10000);

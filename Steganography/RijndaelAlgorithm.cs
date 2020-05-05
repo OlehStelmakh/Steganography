@@ -10,7 +10,10 @@ namespace Steganography
 {
     public class RijndaelAlgorithm
     {
-
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="imageInfo"></param>
         public RijndaelAlgorithm(ImageInfo imageInfo)
         {
             GenereteKeyAndIV(imageInfo);
@@ -19,23 +22,37 @@ namespace Steganography
         private static byte[] Key = new byte[32];
         private static byte[] IV = new byte[16];
 
+        /// <summary>
+        /// Ecnrypt string using Rijndael algorithm 
+        /// </summary>
+        /// <param name="textForEncrypt"></param>
+        /// <returns></returns>
         public byte[] Encrypt(string textForEncrypt)
         {
             byte[] encrypted = EncryptStringToBytes(textForEncrypt, Key, IV);
             return encrypted;
         }
 
+        /// <summary>
+        /// Decrypt string using Rijndael algorithm
+        /// </summary>
+        /// <param name="textForDecrypt"></param>
+        /// <returns></returns>
         public string Decrypt(byte[] textForDecrypt)
         {
             string decrypted = DecryptStringFromBytes(textForDecrypt, Key, IV);
             return decrypted;
         }
 
+        /// <summary>
+        /// Generate key and IV for Rijndael algorithm using characteristics of image
+        /// </summary>
+        /// <param name="imageInfo"></param>
         public static void GenereteKeyAndIV(ImageInfo imageInfo)
         {
             //key 
-            Pixel pixel1 = new Pixel(1,1, imageInfo.Pixels[1,1]);
-            Pixel pixel2 = new Pixel(imageInfo.Height - 1, imageInfo.Width-1, imageInfo.Pixels[imageInfo.Height - 1, imageInfo.Width - 1]);
+            Pixel pixel1 = new Pixel(1, 1, imageInfo.Pixels[1, 1]);
+            Pixel pixel2 = new Pixel(imageInfo.Height - 1, imageInfo.Width - 1, imageInfo.Pixels[imageInfo.Height - 1, imageInfo.Width - 1]);
             string input = pixel1.Color.Name + pixel2.Color.Name;
             string hashKey = HashGenerator.GenerateUniqueValue256(input);
             Array.Copy(Encoding.ASCII.GetBytes(hashKey), Key, 32);

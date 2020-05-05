@@ -11,6 +11,11 @@ namespace Steganography.Shared
 {
     class ImageProcessing
     {
+        /// <summary>
+        /// Convert 2d array of pixels to bitmap
+        /// </summary>
+        /// <param name="integers"></param>
+        /// <returns></returns>
         public static Bitmap Array2DToBitmap(int[,] integers)
         {
             int width = integers.GetLength(0);
@@ -31,6 +36,11 @@ namespace Steganography.Shared
             return bitmap;
         }
 
+        /// <summary>
+        /// Convert bitmap to 2d array of pixels
+        /// </summary>
+        /// <param name="image"></param>
+        /// <returns></returns>
         public static Color[,] BitmapToArray2D(Bitmap image)
         {
             Color[,] array2D = new Color[image.Height, image.Width];
@@ -67,6 +77,12 @@ namespace Steganography.Shared
             return array2D;
         }
 
+        /// <summary>
+        /// Take the next coordinates (similar to linked list)
+        /// </summary>
+        /// <param name="previousCoordinates"></param>
+        /// <param name="imageInfo"></param>
+        /// <returns></returns>
         public static Pixel GetNextCoordinates(Pixel previousCoordinates, ImageInfo imageInfo)
         {
             int maxX = imageInfo.Width;
