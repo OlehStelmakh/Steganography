@@ -6,7 +6,6 @@ namespace Steganography
 {
     public class Parser
     {
-
         private string[] arrayOfLines { get; set; }
 
         /// <summary>

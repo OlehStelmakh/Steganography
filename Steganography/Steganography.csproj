@@ -79,6 +79,7 @@
     <Compile Include="RijndaelAlgorithm.cs" />
     <Compile Include="Shared\HashGenerator.cs" />
     <Compile Include="Shared\ImageProcessing.cs" />
+    <Compile Include="Shared\StatusStrings.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

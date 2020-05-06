@@ -14,11 +14,12 @@ using Steganography.Shared;
 using Steganography;
 using Steganography.Decrypt;
 using Steganography.Encrypt;
+using Brush = System.Windows.Media.Brush;
 using Color = System.Drawing.Color;
 
 namespace Steganography
 {
-    public class MainCalculations : INotifyPropertyChanged
+    public class MainCalculations : INotifyPropertyChanged, IDisposable
     {
         private ImageInfo _downloadedImage;
         private byte[] _inputKeyInfo;
@@ -64,7 +65,27 @@ namespace Steganography
             }
         }
 
-        public Bitmap bm { set; get; }
+        private Brush _statusColor;
+
+        public Brush StatusColor
+        {
+            get => _statusColor;
+            set
+            {
+                _statusColor = value;
+                RaisePropertyChanged("StatusColor");
+            }
+        }
+
+        private void ChangeStatusSettings(string message, Color color)
+        {
+            StatusText = message;
+            StatusColor = new SolidColorBrush(System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B));
+        }
+
+        public delegate void StatusHandler(string message, Color color);
+
+        public static event StatusHandler Notify;
 
         /// <summary>
         /// Constructor that instantiate the commands
@@ -76,6 +97,7 @@ namespace Steganography
             DecryptCommand = new Command(ExecuteDecrypt);
             EncryptCommand = new Command(ExecuteEncrypt);
             OpenFileDialogTextCommand = new Command(ExecuteOpenFileDialogText);
+            Notify += ChangeStatusSettings;
         }
 
         private void ExecuteOpenFileDialogText()
@@ -85,9 +107,15 @@ namespace Steganography
                 Multiselect = false,
                 Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*"
             };
+            Notify?.Invoke(StatusStrings.ReadingTextFromFile, Color.DeepSkyBlue);
             if (openFileDialog.ShowDialog() == true)
             {
                 Message = File.ReadAllText(openFileDialog.FileName);
+                Notify?.Invoke(StatusStrings.TextRead, Color.SeaGreen);
+            }
+            else
+            {
+                Notify?.Invoke(StatusStrings.OperationStopped, Color.IndianRed);
             }
         }
 
@@ -98,13 +126,14 @@ namespace Steganography
                 Multiselect = false,
                 Filter = "Image files (*.BMP, *.JPG, *.GIF, *.TIF, *.PNG, *.ICO, *.EMF, *.WMF)|*.bmp;*.jpg;*.gif; *.tif; *.png; *.ico; *.emf; *.wmf"
             };
+            Notify?.Invoke(StatusStrings.ImageAdding, Color.DeepSkyBlue);
             if (openFileDialog.ShowDialog() == true)
             {
                 using (var stream = new FileStream(openFileDialog.FileName, FileMode.Open))
                 {
 
                     ImageBinding = BitmapFrame.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
-                    RaisePropertyChanged("ImageBinding");
+
                     if (ImageBinding.Width < 4 || ImageBinding.Height < 4)
                     {
                         MessageBox.Show("Please choose a better image");
@@ -114,8 +143,13 @@ namespace Steganography
                     Bitmap bitmap = new Bitmap(stream);
                     _downloadedImage = new ImageInfo(image, bitmap, openFileDialog.FileName);
                     _downloadedImage.Pixels = ImageProcessing.BitmapToArray2D(_downloadedImage.Bitmap);
-
+                    RaisePropertyChanged("ImageBinding");
+                    Notify?.Invoke(StatusStrings.ImageAdded, Color.SeaGreen);
                 }
+            }
+            else
+            {
+                Notify?.Invoke(StatusStrings.OperationStopped, Color.IndianRed);
             }
         }
 
@@ -126,9 +160,15 @@ namespace Steganography
                 Multiselect = false,
                 Filter = "Text files (*.txt)|*.txt"
             };
+            Notify?.Invoke(StatusStrings.ReadingKeyFile, Color.DeepSkyBlue);
             if (openFileDialog.ShowDialog() == true)
             {
                 _inputKeyInfo = File.ReadAllBytes(openFileDialog.FileName);
+                Notify?.Invoke(StatusStrings.KeyFileAdded, Color.SeaGreen);
+            }
+            else
+            {
+                Notify?.Invoke(StatusStrings.OperationStopped, Color.IndianRed);
             }
         }
 
@@ -137,15 +177,16 @@ namespace Steganography
             if (_downloadedImage == null || String.IsNullOrWhiteSpace(Message))
             {
                 MessageBox.Show("Please choose an image and/or provide a text for encrypting.");
+                Notify?.Invoke(StatusStrings.MissingFile, Color.IndianRed);
                 return;
             }
+            Notify?.Invoke(StatusStrings.Encryption, Color.DeepSkyBlue);
             ImageEncoder encoder = new ImageEncoder(_downloadedImage);
             Pixel firstCoordinates = encoder.GetFirstRandomCoordinates();
             string textBlock = Message;
             int offsetCount = encoder.CalcuteOffset(firstCoordinates);
             var symbolsAndCoordinates = encoder.GetAllColors(textBlock, firstCoordinates);
-            //TODO add color analyzer
-            //symbolsAndCoordinates = encoder.AddUniqueNumberToPixel(symbolsAndCoordinates);
+            Notify?.Invoke(StatusStrings.CreatingHashes, Color.DeepSkyBlue);
             var symbolsAndHashes = encoder.CreateOutputHashesInfo(symbolsAndCoordinates);
             var noise = encoder.GenerateSymbolNoise(symbolsAndCoordinates);
             OutputInfo outputInfo = new OutputInfo(firstCoordinates, offsetCount,
@@ -154,6 +195,7 @@ namespace Steganography
             string outputData = outputProcessing.CreateOutputString();
             RijndaelAlgorithm rijndaelAlgorithm = new RijndaelAlgorithm(_downloadedImage);
             byte[] dataForSaving = rijndaelAlgorithm.Encrypt(outputData);
+            Notify?.Invoke(StatusStrings.SavingData, Color.DeepSkyBlue);
             SaveOutput(dataForSaving);
         }
 
@@ -162,6 +204,7 @@ namespace Steganography
             if (_inputKeyInfo == null || _downloadedImage == null)
             {
                 MessageBox.Show("Please choose an image and/or key file.");
+                Notify?.Invoke(StatusStrings.MissingFile, Color.IndianRed);
                 return;
             }
             RijndaelAlgorithm rijndaelAlgorithm = new RijndaelAlgorithm(_downloadedImage);
@@ -170,11 +213,13 @@ namespace Steganography
             {
                 decriptedData = rijndaelAlgorithm.Decrypt(_inputKeyInfo);
             }
-            catch (CryptographicException)
+            catch (Exception)
             {
-                MessageBox.Show("An error occurred during the decrypting!");
+                MessageBox.Show(StatusStrings.ErrorDecrypting);
+                Notify?.Invoke(StatusStrings.ErrorDecrypting, Color.IndianRed);
                 return;
             }
+            Notify?.Invoke(StatusStrings.StartedParsing, Color.DeepSkyBlue);
             Parser parseData = new Parser(decriptedData);
             Color firstColor = parseData.GetColorFromString();
             int offsetOfFirstColor = parseData.GetOffsetOfcolor();
@@ -182,11 +227,20 @@ namespace Steganography
             int lengthOfText = parseData.GetLengthOfText();
             ParsedData parsedData = new ParsedData(firstColor, offsetOfFirstColor,
                 symbolsAndHashes, lengthOfText);
-
+            Notify?.Invoke(StatusStrings.StartingDecoding, Color.DeepSkyBlue);
             ImageDecoder imageDecoder = new ImageDecoder(parsedData, _downloadedImage);
             Pixel firstValue = imageDecoder.GetCoordinatesOfFirst();
-
-            string text = imageDecoder.DecryptText(firstValue);
+            Notify?.Invoke(StatusStrings.DataDecoded, Color.SeaGreen);
+            string text = string.Empty;
+            try
+            {
+                text = imageDecoder.DecryptText(firstValue);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Unable to decrypt this file." + e.Message);
+                return;
+            }
             SaveOutput(text);
         }
 
@@ -208,6 +262,7 @@ namespace Steganography
                     File.WriteAllText(svd.FileName, data.ToString());
                 }
             }
+            Notify?.Invoke(StatusStrings.DataSaved, Color.SeaGreen);
         }
 
         /// <summary>
@@ -217,6 +272,11 @@ namespace Steganography
         void RaisePropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void Dispose()
+        {
+            Notify -= ChangeStatusSettings;
         }
     }
 

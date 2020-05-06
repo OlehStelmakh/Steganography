@@ -1,11 +1,7 @@
 ﻿using Steganography.Models;
 using Steganography.Shared;
 using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Steganography.Decrypt
 {
@@ -64,6 +60,7 @@ namespace Steganography.Decrypt
         {
             StringBuilder stringBuilder = new StringBuilder(_parsedData.LengthOfText);
             Pixel previousCoordinates = firstCoordinates;
+
             for (int i = 0; i < _parsedData.LengthOfText; i++)
             {
                 previousCoordinates = ImageProcessing.GetNextCoordinates(previousCoordinates, _imageInfo);
