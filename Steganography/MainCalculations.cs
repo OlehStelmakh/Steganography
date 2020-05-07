@@ -71,6 +71,7 @@ namespace Steganography
                     {
                         _message = string.Empty;
                         Notify.Invoke(StatusStrings.ErrorDuringReading, Color.IndianRed);
+                        RaisePropertyChanged("Message");
                         return;
                     }
                 }
