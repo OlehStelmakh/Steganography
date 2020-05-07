@@ -31,6 +31,7 @@ namespace Steganography.Shared
 
         public static string ReadingTextFromFile = "Reading text from file";
         public static string TextRead = "Text has been read and added";
+        public static string ErrorDuringReading = "Text consists of symbols not included in the 32-127 ASCII range!";
 
         public static string DataSaved = "Data has been saved";
         public static string StartedParsing = "Parsing of data in progress";
@@ -39,5 +40,6 @@ namespace Steganography.Shared
 
         public static string ErrorDecrypting = "An error occurred during the decrypting!";
         public static string MissingFile = "Required files missed";
+
     }
 }

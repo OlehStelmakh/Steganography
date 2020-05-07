@@ -16,6 +16,7 @@ using Steganography.Decrypt;
 using Steganography.Encrypt;
 using Brush = System.Windows.Media.Brush;
 using Color = System.Drawing.Color;
+using System.Windows.Controls.Primitives;
 
 namespace Steganography
 {
@@ -35,6 +36,21 @@ namespace Steganography
 
         public ICommand OpenFileDialogTextCommand { get; }
 
+        public string TextLimit
+        {
+            get => $"Limit: {LengthLimitation} symbols.";
+        }
+
+        private readonly int _lengthLimitation = 10000;
+
+        /// <summary>
+        /// Limit of length for text
+        /// </summary>
+        public int LengthLimitation
+        {
+            get => _lengthLimitation;
+        }
+
         private string _message;
 
         /// <summary>
@@ -45,7 +61,21 @@ namespace Steganography
             get => _message;
             set
             {
+                if (value.Length > LengthLimitation)
+                {
+                    value = value.Substring(0, LengthLimitation);
+                }
+                for (int i= 0; i< value.Length; i++) {
+                    int convertedValue = Convert.ToInt32(value[i]);
+                    if (convertedValue>127 || convertedValue<32)
+                    {
+                        _message = string.Empty;
+                        Notify.Invoke(StatusStrings.ErrorDuringReading, Color.IndianRed);
+                        return;
+                    }
+                }
                 _message = value;
+                Notify?.Invoke(StatusStrings.TextRead, Color.SeaGreen);
                 RaisePropertyChanged("Message");
             }
         }
@@ -111,7 +141,6 @@ namespace Steganography
             if (openFileDialog.ShowDialog() == true)
             {
                 Message = File.ReadAllText(openFileDialog.FileName);
-                Notify?.Invoke(StatusStrings.TextRead, Color.SeaGreen);
             }
             else
             {
@@ -134,7 +163,7 @@ namespace Steganography
 
                     ImageBinding = BitmapFrame.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
 
-                    if (ImageBinding.Width < 4 || ImageBinding.Height < 4)
+                    if (ImageBinding.Width*ImageBinding.Height < 10000)
                     {
                         MessageBox.Show("Please choose a better image");
                         return;

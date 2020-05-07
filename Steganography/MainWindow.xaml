@@ -54,7 +54,13 @@
                         <Label Content="Decrypt" FontSize="18" Foreground="White" Margin="0"/>
                     </StackPanel>
                 </Button>
-
+                <Border Margin="10 0 10 0" BorderBrush="YellowGreen" BorderThickness="2">
+                    <StackPanel>
+                        <TextBlock Margin="10" Text="All 32-127 ASCII symbols are available" FontSize="16" Foreground="White" TextWrapping="Wrap" TextAlignment="Center"/>
+                        <TextBlock Margin="10 0 10 10" Text="{Binding TextLimit}" FontSize="16" Foreground="White" TextWrapping="Wrap" TextAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+                
                 <TextBlock Margin="10" Text="{Binding StatusText}" FontSize="18" Foreground="{Binding StatusColor}" TextWrapping="Wrap" TextAlignment="Center"/>
 
             </StackPanel>
@@ -80,7 +86,7 @@
             <GridSplitter Grid.Row="1" ShowsPreview="False" Height="5"
                           HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="#FF404040"/>
             <Border Background="White" BorderBrush="#FF404040"  BorderThickness="2" Grid.Row="2">
-                <TextBox Margin="10 10 10 10" VerticalScrollBarVisibility="Auto" TextWrapping = "Wrap" Text="{Binding Message, Mode=TwoWay }" />
+                <TextBox Margin="10 10 10 10" VerticalScrollBarVisibility="Auto" MaxLength="{Binding LengthLimitation}" TextWrapping = "Wrap" Text="{Binding Message, Mode=TwoWay }" />
             </Border>
         </Grid>
 
